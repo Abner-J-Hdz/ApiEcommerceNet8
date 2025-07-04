@@ -12,6 +12,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 // Register the repository services antes de usarlos en los controladores, sino daran errores
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductoRepository, ProductRepository>();//Add scoped permite que se inyecte la dependencia en el controlador
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
 //configurar autommaper
@@ -47,7 +48,7 @@ ENTITY FRAMEWORK CORE 9.0.6
 ENTITY FRAMEWORK CORE SQL SERVER 9.0.6
 ENTITY FRAMEWORK CORE TOOLS 9.0.6
 AUTOMAPPER 14.0.0
-
+BCrypt.Net-Next 4.0.3
 Instalar Entity Framework Core Tools en la consola del administrador de paquetes:
 dotnet tool install --global dotnet-ef
 
