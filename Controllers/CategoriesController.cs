@@ -1,7 +1,9 @@
-﻿using ApiEcommerce.Models;
+﻿using ApiEcommerce.Constants;
+using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
 using AutoMapper;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +11,8 @@ namespace ApiEcommerce.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	//[EnableCors("AllowSpecificOrigin")]//Configuracion de cors a  nivel de controlador
+	//[EnableCors(PolicyNames.AllowSpecificOrigin)]//Configuracion de cors a  nivel de controlador
 	public class CategoriesController : ControllerBase
 	{
 
@@ -25,6 +29,7 @@ namespace ApiEcommerce.Controllers
 		[HttpGet]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status200OK)]
+		//[EnableCors("AllowSpecificOrigin")]// Configuracion de Cors a nivel de metodo
 		public IActionResult GetCategories()
 		{
 			var categories = _categoryRepository.GetCategories();

@@ -1,3 +1,4 @@
+using ApiEcommerce.Constants;
 using ApiEcommerce.Data;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
@@ -32,7 +33,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+/* INICIO CONFIGURACION DE CORS */
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(PolicyNames.AllowSpecificOrigin,
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
+        });
+});
+/* FIN CONFIGURACION DE CORS */
+
 app.UseHttpsRedirection();
+
+/* Uso de la configuracion de cors */
+app.UseCors(PolicyNames.AllowSpecificOrigin);
 
 app.UseAuthorization();
 
