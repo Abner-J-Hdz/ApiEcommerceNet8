@@ -3,6 +3,7 @@ using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Xml.Linq;
@@ -12,6 +13,8 @@ namespace ApiEcommerce.Controllers
 
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize(Roles = "Admin")]  //habilita endpoint privados
+
 	public class ProductsController : ControllerBase
 	{
 		private readonly IProductoRepository _productoRepository;
@@ -28,6 +31,7 @@ namespace ApiEcommerce.Controllers
 		[HttpGet]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status200OK)]
+		[AllowAnonymous]
 		public IActionResult GetProducts()
 		{
 			var products = _productoRepository.GetProducts();
@@ -36,6 +40,7 @@ namespace ApiEcommerce.Controllers
 		}
 
 		[HttpGet("{productId:int}", Name = "GetProduct")]
+		[AllowAnonymous]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]

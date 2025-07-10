@@ -1,0 +1,245 @@
+{
+	"info": {
+		"_postman_id": "a40afd17-d2f5-447d-8073-87fe9862d9ff",
+		"name": "Api Ecommerce devtalles",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15885268"
+	},
+	"item": [
+		{
+			"name": "Category",
+			"item": [
+				{
+					"name": "Listado de categorias",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7236/api/Categories",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7236",
+							"path": [
+								"api",
+								"Categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener una categoria",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7236/api/Categories/1",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7236",
+							"path": [
+								"api",
+								"Categories",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear una categoria",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VyTmFtZSI6ImFkbWluIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzUyMTI1NTgxLCJleHAiOjE3NTIxMzI3ODEsImlhdCI6MTc1MjEyNTU4MX0.Q2wyGLOXsXoFGNjGIi7_W3Si_HEnxKPBi5gSLLUCD_E",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Construccion\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7236/api/Categories",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7236",
+							"path": [
+								"api",
+								"Categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar una categoria",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VyTmFtZSI6ImFkbWluIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzUyMTI1NTgxLCJleHAiOjE3NTIxMzI3ODEsImlhdCI6MTc1MjEyNTU4MX0.Q2wyGLOXsXoFGNjGIi7_W3Si_HEnxKPBi5gSLLUCD_E",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7236/api/Categories/8",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7236",
+							"path": [
+								"api",
+								"Categories",
+								"8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar una categoria",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VyTmFtZSI6ImFkbWluIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzUyMTI1NTgxLCJleHAiOjE3NTIxMzI3ODEsImlhdCI6MTc1MjEyNTU4MX0.Q2wyGLOXsXoFGNjGIi7_W3Si_HEnxKPBi5gSLLUCD_E",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Accesorios Updated\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7236/api/Categories/2",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7236",
+							"path": [
+								"api",
+								"Categories",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Crear usuario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"david\",\r\n  \"name\": \"david\",\r\n  \"password\": \"David123#\",\r\n  \"role\": \"Admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7236/api/User",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7236",
+							"path": [
+								"api",
+								"User"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Acceso Usuario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"Abner123#\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7236/api/User/Login",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7236",
+							"path": [
+								"api",
+								"User",
+								"Login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
