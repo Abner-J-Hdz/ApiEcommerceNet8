@@ -3,6 +3,7 @@ using ApiEcommerce.Data;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -14,6 +15,39 @@ var builder = WebApplication.CreateBuilder(args);
 var dbConnectionString = builder.Configuration.GetConnectionString("ConexionSql");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(dbConnectionString));
+
+
+/* Configuracion de cache*/
+/*
+ Claro, esta sección de código configura el servicio de Response Caching en una aplicación ASP.NET Core. 
+Este servicio permite almacenar en caché las respuestas HTTP para mejorar el rendimiento y reducir 
+la carga en el servidor. Vamos a desglosarlo:
+ */
+builder.Services.AddResponseCaching(options =>
+{
+	/*
+1.	AddResponseCaching:
+•	Este método registra el middleware de Response Caching en el contenedor de servicios de la aplicación. 
+	Esto significa que el middleware estará disponible para su uso en el pipeline de solicitudes HTTP.
+•	El middleware de Response Caching almacena en caché las respuestas HTTP que cumplen con ciertos criterios, 
+	como tener encabezados específicos (Cache-Control, Expires, etc.).	 
+	 */
+
+	options.MaximumBodySize = 1024 * 1024;//1M
+
+	/*
+•	Este parámetro indica si las rutas de las solicitudes deben ser sensibles a mayúsculas y minúsculas al determinar si una respuesta está en caché.	 
+	 */
+	/*
+•	Si se establece en true, las rutas como /api/product y /API/Product se tratarán como diferentes y tendrán entradas de caché separadas.
+•	Esto es importante en sistemas donde las rutas pueden diferir por el uso de mayúsculas y minúsculas.	 
+	 */
+	options.UseCaseSensitivePaths = true;
+});
+/*Para que esta configuración funcione, es necesario habilitar el middleware de Response Caching e
+ * n el pipeline de la aplicación, lo cual ya se hace más adelante en el archivo con esta línea:*/
+
+
 // Register the repository services antes de usarlos en los controladores, sino daran errores
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductoRepository, ProductRepository>();//Add scoped permite que se inyecte la dependencia en el controlador
@@ -48,7 +82,17 @@ builder.Services.AddAuthentication(options =>
 	};
 });
 
-builder.Services.AddControllers();
+/*configurar perfiles de caché  de manera global para luego poderlos usar en los controladores*/
+builder.Services.AddControllers(options =>
+{
+	options.CacheProfiles.Add(CacheProfiles.Default10, CacheProfiles.Profile10);
+	options.CacheProfiles.Add(CacheProfiles.Default20, CacheProfiles.Profile20);
+
+});
+
+
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
@@ -111,6 +155,9 @@ app.UseHttpsRedirection();
 
 /* Uso de la configuracion de cors */
 app.UseCors(PolicyNames.AllowSpecificOrigin);
+
+/*Habilita el uso de cachè*/
+app.UseResponseCaching();
 
 //PARA HABILITAR EL AUTHORIZE Y ALLOW ANONYMOUS Siempre antes de UseAuthorization
 app.UseAuthentication();

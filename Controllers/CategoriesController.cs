@@ -29,6 +29,7 @@ namespace ApiEcommerce.Controllers
 
 
 		[HttpGet]
+
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[AllowAnonymous]//hace que un metodo sea publico
@@ -49,6 +50,7 @@ namespace ApiEcommerce.Controllers
 		}
 
 		[HttpGet("{id:int}", Name = "GetCategory")]//obtener un id del query string
+		[ResponseCache(CacheProfileName = CacheProfiles.Default10)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -56,7 +58,11 @@ namespace ApiEcommerce.Controllers
 		[AllowAnonymous]//hace que un metodo sea publico
 		public IActionResult GetCategory(int id)//igual al del httpget
 		{
+			Console.WriteLine($"Categoria con el ID {id} a las {DateTime.Now}");
+
 			var category = _categoryRepository.GetCategory(id);
+
+			Console.WriteLine($"Categoria con el ID {id}");
 
 			if (category is null)
 				return NotFound($"La categoria con id {id} no existe");
