@@ -2,6 +2,7 @@ using ApiEcommerce.Constants;
 using ApiEcommerce.Data;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -126,9 +127,64 @@ builder.Services.AddSwaggerGen(
 		new List<string>()
 	  }
 	});
+	  options.SwaggerDoc("v1", new OpenApiInfo
+	  {
+		  Version = "v1",
+		  Title = "Api Ecommerce",
+		  Description = "Api para gestionar productos y usuarios",
+		  TermsOfService = new Uri("https://example.com/terms"),
+		  Contact = new OpenApiContact
+		  {
+			  Name = "anrcode",
+			  Url = new Uri("https://anrcode.com")
+		  }, 
+		  License = new OpenApiLicense
+		  {
+			  Name = "Licencia de uso",
+			  Url = new Uri("https://example.com/license")
+		  }
+	  });
+
+	  options.SwaggerDoc("v2", new OpenApiInfo
+	  {
+		  Version = "v2",
+		  Title = "Api Ecommerce v2",
+		  Description = "Api para gestionar productos y usuarios",
+		  TermsOfService = new Uri("https://example.com/terms"),
+		  Contact = new OpenApiContact
+		  {
+			  Name = "anrcode",
+			  Url = new Uri("https://anrcode.com")
+		  },
+		  License = new OpenApiLicense
+		  {
+			  Name = "Licencia de uso",
+			  Url = new Uri("https://example.com/license")
+		  }
+	  });
   }
 );
 
+
+/* INICIO CONFIGURACION DE VERSIONAMIENTO */
+
+var apiVersioningBuilder = builder.Services.AddApiVersioning(option =>
+{
+	option.AssumeDefaultVersionWhenUnspecified = true;//asume una version por defecto
+	option.DefaultApiVersion = new ApiVersion(1, 0);// indicamos la version por defecto
+	option.ReportApiVersions = true;//esto para que devuelva  info en los header de respuesta, así: api-supported-versions: 1.0 
+	//option.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader("api-version"));//?api-version //OSEA va a ser necesario que se pase en la url
+});
+
+apiVersioningBuilder.AddApiExplorer(option =>
+{
+	option.GroupNameFormat = "'v'VVV";//v1,v2,v3 => indincamos esto con esta linea  de codigo
+	option.SubstituteApiVersionInUrl = true;//habilitará el uso de version en la url en cada peticion en la ruta
+	//pero hay que configurar el controlador, en el apiVersioningBuilder y setear la prop
+
+});
+
+/* FIN CONFIGURACION DE VERSIONAMIENTO */
 
 /* INICIO CONFIGURACION DE CORS  nota: escribir antes del builder*/
 builder.Services.AddCors(options =>
@@ -147,7 +203,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+	{
+		options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+		options.SwaggerEndpoint("/swagger/v2/swagger.json", "v2");
+	});
 }
 
 
@@ -180,6 +240,13 @@ BCrypt.Net-Next 4.0.3
 
 Microsoft.AspNetCore.Authentication.JwtBearer --esto para configurar luego la authenticacion con jwt en el program
 //usar la misma veersion del sdk con JwtBearer, sino dará problemas
+
+
+Para el uso de versionamiento instalamos
+Asp.Versioning.Mvc 8.0.1
+Asp.Versioning.Mvc.ApiExplorer 8.0.1
+
+
 
 Instalar Entity Framework Core Tools en la consola del administrador de paquetes:
 dotnet tool install --global dotnet-ef

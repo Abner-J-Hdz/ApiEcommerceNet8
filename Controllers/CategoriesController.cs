@@ -2,6 +2,7 @@
 using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -10,8 +11,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ApiEcommerce.Controllers
 {
-	[Route("api/[controller]")]
+	[Route("api/v{version:apiVersion}/[controller]")]
 	[ApiController]
+	[ApiVersion("1.0")]//Establecemos las versiones que soporta este controllador
+	[ApiVersion("2.0")]
 	[Authorize(Roles = "Admin")] //habilita endpoint privados
 	//[EnableCors("AllowSpecificOrigin")]//Configuracion de cors a  nivel de controlador
 	//[EnableCors(PolicyNames.AllowSpecificOrigin)]//Configuracion de cors a  nivel de controlador
@@ -29,7 +32,7 @@ namespace ApiEcommerce.Controllers
 
 
 		[HttpGet]
-
+		[MapToApiVersion("1.0")]//decimos a que version pertenece este endpoint
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[AllowAnonymous]//hace que un metodo sea publico
@@ -47,6 +50,18 @@ namespace ApiEcommerce.Controllers
 			//}
 			//return Ok(categoriesDto);
 
+		}
+
+		[HttpGet]
+		[MapToApiVersion("2.0")]//indicamos la version a la que pertecenece
+		[ProducesResponseType(StatusCodes.Status403Forbidden)]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[AllowAnonymous]
+		public IActionResult GetCategoriesOrdeById()
+		{
+			var categories = _categoryRepository.GetCategories().OrderBy(x => x.Id);
+			var categoriesDto = _mapper.Map<List<CategoryDto>>(categories);
+			return Ok(categoriesDto);
 		}
 
 		[HttpGet("{id:int}", Name = "GetCategory")]//obtener un id del query string

@@ -11,7 +11,7 @@ using System.Xml.Linq;
 namespace ApiEcommerce.Controllers
 {
 
-	[Route("api/[controller]")]
+	[Route("api/v{version:apiVersion}/[controller]")]
 	[ApiController]
 	[Authorize(Roles = "Admin")]  //habilita endpoint privados
 
