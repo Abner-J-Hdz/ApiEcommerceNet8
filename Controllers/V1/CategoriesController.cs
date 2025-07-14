@@ -9,15 +9,14 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ApiEcommerce.Controllers
+namespace ApiEcommerce.Controllers.V1
 {
 	[Route("api/v{version:apiVersion}/[controller]")]
 	[ApiController]
 	[ApiVersion("1.0")]//Establecemos las versiones que soporta este controllador
-	[ApiVersion("2.0")]
 	[Authorize(Roles = "Admin")] //habilita endpoint privados
-	//[EnableCors("AllowSpecificOrigin")]//Configuracion de cors a  nivel de controlador
-	//[EnableCors(PolicyNames.AllowSpecificOrigin)]//Configuracion de cors a  nivel de controlador
+								 //[EnableCors("AllowSpecificOrigin")]//Configuracion de cors a  nivel de controlador
+								 //[EnableCors(PolicyNames.AllowSpecificOrigin)]//Configuracion de cors a  nivel de controlador
 	public class CategoriesController : ControllerBase
 	{
 
@@ -36,7 +35,8 @@ namespace ApiEcommerce.Controllers
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[AllowAnonymous]//hace que un metodo sea publico
-		//[EnableCors("AllowSpecificOrigin")]// Configuracion de Cors a nivel de metodo
+						//[EnableCors("AllowSpecificOrigin")]// Configuracion de Cors a nivel de metodo
+		[Obsolete("Este método está obsoleto. Use GetCategoriesById de la version 2 en su lugar")]
 		public IActionResult GetCategories()
 		{
 			var categories = _categoryRepository.GetCategories();
@@ -50,18 +50,6 @@ namespace ApiEcommerce.Controllers
 			//}
 			//return Ok(categoriesDto);
 
-		}
-
-		[HttpGet]
-		[MapToApiVersion("2.0")]//indicamos la version a la que pertecenece
-		[ProducesResponseType(StatusCodes.Status403Forbidden)]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		[AllowAnonymous]
-		public IActionResult GetCategoriesOrdeById()
-		{
-			var categories = _categoryRepository.GetCategories().OrderBy(x => x.Id);
-			var categoriesDto = _mapper.Map<List<CategoryDto>>(categories);
-			return Ok(categoriesDto);
 		}
 
 		[HttpGet("{id:int}", Name = "GetCategory")]//obtener un id del query string
@@ -106,7 +94,7 @@ namespace ApiEcommerce.Controllers
 
 			var category = _mapper.Map<Category>(categoryDto);
 
-			if(!_categoryRepository.CreateCategory(category))
+			if (!_categoryRepository.CreateCategory(category))
 			{
 				ModelState.AddModelError("CustomError", $"Ocurrió un error al guardar el registro {category.Name}");
 				return StatusCode(500, ModelState);
@@ -129,7 +117,7 @@ namespace ApiEcommerce.Controllers
 
 			if (!_categoryRepository.CategoryExists(id))
 				return NotFound($"La categoria con id {id} no existe");
-			
+
 
 			if (_categoryRepository.CategoryExists(updateCategoryDto.Name))
 			{
@@ -161,7 +149,7 @@ namespace ApiEcommerce.Controllers
 
 			var category = _categoryRepository.GetCategory(id);
 
-			if(category is null)
+			if (category is null)
 			{
 				return NotFound($"La categoria con el Id {id} no existe");
 			}

@@ -1,5 +1,6 @@
 ﻿using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +11,9 @@ namespace ApiEcommerce.Controllers
 	[Route("api/v{version:apiVersion}/[controller]")]
 	[ApiController]
 	[Authorize] //habilita endpoint privados
+				//[ApiVersion("1.0")]//Establecemos las versiones que soporta este controllador
+				//[ApiVersion("2.0")]//Establecemos las versiones que soporta este controllador
+	[ApiVersionNeutral]
 	public class UserController : ControllerBase
 	{
 		private readonly IUserRepository _userRepository;

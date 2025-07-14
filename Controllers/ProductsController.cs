@@ -1,12 +1,10 @@
 ﻿using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
-using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Xml.Linq;
 
 namespace ApiEcommerce.Controllers
 {
@@ -14,6 +12,9 @@ namespace ApiEcommerce.Controllers
 	[Route("api/v{version:apiVersion}/[controller]")]
 	[ApiController]
 	[Authorize(Roles = "Admin")]  //habilita endpoint privados
+	[ApiVersionNeutral]
+	//[ApiVersion("1.0")]//Establecemos las versiones que soporta este controllador
+	//[ApiVersion("2.0")]//Establecemos las versiones que soporta este controllador
 
 	public class ProductsController : ControllerBase
 	{
