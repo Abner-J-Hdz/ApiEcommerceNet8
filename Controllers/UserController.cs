@@ -37,14 +37,14 @@ namespace ApiEcommerce.Controllers
 			return Ok(userDto);
 		}
 
-		[HttpGet("{idUser:int}", Name = "GetUser")]
+		[HttpGet("{idUser}", Name = "GetUser")]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		[ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-		public IActionResult GetUser(int idUser)
+		public IActionResult GetUser(string idUser)
 		{
-			if (idUser <= 0)
+			if (string.IsNullOrEmpty(idUser))
 			{
 				ModelState.AddModelError("CustomError", "IdUser invalido");
 				return BadRequest(ModelState);
