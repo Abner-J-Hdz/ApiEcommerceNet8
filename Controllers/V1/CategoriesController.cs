@@ -36,7 +36,8 @@ namespace ApiEcommerce.Controllers.V1
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[AllowAnonymous]//hace que un metodo sea publico
 						//[EnableCors("AllowSpecificOrigin")]// Configuracion de Cors a nivel de metodo
-		[Obsolete("Este método está obsoleto. Use GetCategoriesById de la version 2 en su lugar")]
+		[Obsolete("Este método está obsoleto. Use GetCategoriesById de la version 2 en su lugar." +
+			"")]
 		public IActionResult GetCategories()
 		{
 			var categories = _categoryRepository.GetCategories();
