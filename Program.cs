@@ -215,6 +215,8 @@ if (app.Environment.IsDevelopment())
 	});
 }
 
+// para que el api soporte tener imagenes, css, algun javascript, o archivo
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 

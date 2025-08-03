@@ -10,7 +10,9 @@ public class ProductDto
 
 	public decimal Price { get; set; }
 
-	public string ImgUrl { get; set; } = string.Empty;
+	public string? ImgUrl { get; set; } 
+
+	public string? ImageUrlLocal { get; set; }
 
 	public string SKU { get; set; } = string.Empty;//PROD-001-BLK-M
 

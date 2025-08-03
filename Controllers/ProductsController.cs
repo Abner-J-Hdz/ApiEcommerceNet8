@@ -63,7 +63,7 @@ namespace ApiEcommerce.Controllers
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(StatusCodes.Status201Created)]
 		[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-		public ActionResult PostProduct([FromBody] CreateProductDto createProductDto)
+		public ActionResult PostProduct([FromForm] CreateProductDto createProductDto)
 		{
 			if (createProductDto == null)
 				return BadRequest(ModelState);
@@ -82,6 +82,18 @@ namespace ApiEcommerce.Controllers
 			}
 
 			var product = _mapper.Map<Product>(createProductDto);
+
+			//Agregando la imagen
+			//validar si no estan mandando la imagen
+			if(createProductDto.Image != null)
+			{
+				UploadProductImage(createProductDto, product);
+			}
+			else
+			{
+				product.ImgUrl = "https://placehold.co/300x300/png";
+			}
+
 
 			if (!_productoRepository.CreateProduct(product))
 			{
@@ -196,7 +208,7 @@ namespace ApiEcommerce.Controllers
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-		public ActionResult PProduct(int productId, [FromBody] UpdateProductDto updateProductDto)
+		public ActionResult UpdateProduct(int productId, [FromForm] UpdateProductDto updateProductDto)
 		{
 			if (updateProductDto == null)
 				return BadRequest(ModelState);
@@ -217,6 +229,18 @@ namespace ApiEcommerce.Controllers
 
 			var product = _mapper.Map<Product>(updateProductDto);
 
+
+			//Agregando la imagen
+			//validar si no estan mandando la imagen
+			if (updateProductDto.Image != null)
+            {
+                UploadProductImage(updateProductDto, product);
+            }
+            else
+			{
+				product.ImgUrl = "https://placehold.co/300x300/png";
+			}
+
 			product.ProductId = productId; // Aseguramos que el ID del producto sea el correcto
 
 			if (!_productoRepository.UpdateProduct(product))
@@ -228,7 +252,34 @@ namespace ApiEcommerce.Controllers
 			return NoContent();
 		}
 
-		[HttpDelete("{productId:int}", Name = "DeleteProduct")]
+        private void UploadProductImage(dynamic productDto, Product product)
+        {
+            string fileName = product.ProductId.ToString() + "-" + Guid.NewGuid().ToString() + Path.GetExtension(productDto.Image.FileName);
+            var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductsImages");// carpeta donde se guardará la imagen
+                                                                                                          //Sino existe el directorio lo creamos
+            if (!Directory.Exists(imagesFolder))
+            {
+                Directory.CreateDirectory(imagesFolder);
+            }
+            //creamos la ruta donde se guardará la imagen
+            var filePath = Path.Combine(imagesFolder, fileName);
+            //verificamos si ya esiste un archivo igual
+            FileInfo file = new FileInfo(filePath);
+            if (file.Exists)
+            {
+                //si existe lo eliminamos
+                file.Delete();
+            }
+            //vamos a escribir o guradar el archivo
+            using var fileStream = new FileStream(filePath, FileMode.Create);
+            productDto.Image.CopyTo(fileStream);//la imagen dentro del dto lo pasamos al fileStream
+
+            var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+            product.ImgUrl = $"{baseUrl}/productsImages/{fileName}";
+            product.ImageUrlLocal = filePath;
+        }
+
+        [HttpDelete("{productId:int}", Name = "DeleteProduct")]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
