@@ -130,4 +130,16 @@ public class ProductRepository : IProductoRepository
 		_dbo.Products.Update(product); // Actualizar el producto en la base de datos
 		return Save(); // Guardar los cambios y devolver true si se guardaron correctamente
 	}
+
+	ICollection<Product> IProductoRepository.GetProductsInPages(int pageNumber, int pageSize)
+	{
+		return _dbo.Products.OrderBy(p => p.ProductId)
+			.Skip((pageNumber - 1) * pageSize)
+			.Take(pageSize).ToList();
+	}
+
+	int IProductoRepository.GetTotalProducts()
+	{
+		return _dbo.Products.Count();
+	}
 }

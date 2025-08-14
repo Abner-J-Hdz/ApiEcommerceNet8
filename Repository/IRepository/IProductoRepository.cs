@@ -6,6 +6,10 @@ public interface IProductoRepository
 	//GetProducts
 	ICollection<Product> GetProducts();
 
+	ICollection<Product> GetProductsInPages(int pageNumber, int pageSize);
+
+	int GetTotalProducts();
+
 	//GetProductsForCategory
 	ICollection<Product> GetProductsForCategory(int categoryId);
 
