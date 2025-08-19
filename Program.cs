@@ -1,9 +1,11 @@
 using ApiEcommerce.Constants;
 using ApiEcommerce.Data;
+using ApiEcommerce.Mapping;
 using ApiEcommerce.Models;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
+using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -30,33 +32,33 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 /* Configuracion de cache*/
 /*
- Claro, esta sección de código configura el servicio de Response Caching en una aplicación ASP.NET Core. 
-Este servicio permite almacenar en caché las respuestas HTTP para mejorar el rendimiento y reducir 
+ Claro, esta secciï¿½n de cï¿½digo configura el servicio de Response Caching en una aplicaciï¿½n ASP.NET Core. 
+Este servicio permite almacenar en cachï¿½ las respuestas HTTP para mejorar el rendimiento y reducir 
 la carga en el servidor. Vamos a desglosarlo:
  */
 builder.Services.AddResponseCaching(options =>
 {
 	/*
 1.	AddResponseCaching:
-•	Este método registra el middleware de Response Caching en el contenedor de servicios de la aplicación. 
-	Esto significa que el middleware estará disponible para su uso en el pipeline de solicitudes HTTP.
-•	El middleware de Response Caching almacena en caché las respuestas HTTP que cumplen con ciertos criterios, 
-	como tener encabezados específicos (Cache-Control, Expires, etc.).	 
+ï¿½	Este mï¿½todo registra el middleware de Response Caching en el contenedor de servicios de la aplicaciï¿½n. 
+	Esto significa que el middleware estarï¿½ disponible para su uso en el pipeline de solicitudes HTTP.
+ï¿½	El middleware de Response Caching almacena en cachï¿½ las respuestas HTTP que cumplen con ciertos criterios, 
+	como tener encabezados especï¿½ficos (Cache-Control, Expires, etc.).	 
 	 */
 
 	options.MaximumBodySize = 1024 * 1024;//1M
 
 	/*
-•	Este parámetro indica si las rutas de las solicitudes deben ser sensibles a mayúsculas y minúsculas al determinar si una respuesta está en caché.	 
+ï¿½	Este parï¿½metro indica si las rutas de las solicitudes deben ser sensibles a mayï¿½sculas y minï¿½sculas al determinar si una respuesta estï¿½ en cachï¿½.	 
 	 */
 	/*
-•	Si se establece en true, las rutas como /api/product y /API/Product se tratarán como diferentes y tendrán entradas de caché separadas.
-•	Esto es importante en sistemas donde las rutas pueden diferir por el uso de mayúsculas y minúsculas.	 
+ï¿½	Si se establece en true, las rutas como /api/product y /API/Product se tratarï¿½n como diferentes y tendrï¿½n entradas de cachï¿½ separadas.
+ï¿½	Esto es importante en sistemas donde las rutas pueden diferir por el uso de mayï¿½sculas y minï¿½sculas.	 
 	 */
 	options.UseCaseSensitivePaths = true;
 });
-/*Para que esta configuración funcione, es necesario habilitar el middleware de Response Caching e
- * n el pipeline de la aplicación, lo cual ya se hace más adelante en el archivo con esta línea:*/
+/*Para que esta configuraciï¿½n funcione, es necesario habilitar el middleware de Response Caching e
+ * n el pipeline de la aplicaciï¿½n, lo cual ya se hace mï¿½s adelante en el archivo con esta lï¿½nea:*/
 
 
 // Register the repository services antes de usarlos en los controladores, sino daran errores
@@ -65,8 +67,9 @@ builder.Services.AddScoped<IProductoRepository, ProductRepository>();//Add scope
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
-//configurar autommaper
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+// Configurar Mapster
+builder.Services.AddMapster();
+MapsterConfig.RegisterMappings();
 
 //Configurar servicios de identity framwework core
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
@@ -76,7 +79,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFramework
 var secretKey = builder.Configuration.GetValue<string>("ApiSettings:SecretKey");
 if (string.IsNullOrEmpty(secretKey))
 {
-	throw new InvalidOperationException("Secretkey no está configurado");
+	throw new InvalidOperationException("Secretkey no estï¿½ configurado");
 }
 builder.Services.AddAuthentication(options =>
 {
@@ -89,14 +92,14 @@ builder.Services.AddAuthentication(options =>
 	//parametros de validacion para el token
 	options.TokenValidationParameters = new TokenValidationParameters()//parametros del jwt
 	{
-		ValidateIssuerSigningKey = true,//que esté valido el token
+		ValidateIssuerSigningKey = true,//que estï¿½ valido el token
 		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),// se valida la firma del token
 		ValidateIssuer = false,//no se valida el cliente
 		ValidateAudience = false//no se valida la audiencia o cliente, true valida quien lo consume
 	};
 });
 
-/*configurar perfiles de caché  de manera global para luego poderlos usar en los controladores*/
+/*configurar perfiles de cachï¿½  de manera global para luego poderlos usar en los controladores*/
 builder.Services.AddControllers(options =>
 {
 	options.CacheProfiles.Add(CacheProfiles.Default10, CacheProfiles.Profile10);
@@ -110,13 +113,13 @@ builder.Services.AddControllers(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
-	//configuracion para poder añadir el token a los request de swagger
+	//configuracion para poder aï¿½adir el token a los request de swagger
   options =>
   {
 	  options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
 	  {
-		  Description = "Nuestra API utiliza la Autenticación JWT usando el esquema Bearer. \n\r\n\r" +
-					  "Ingresa la palabra a continuación el token generado en login.\n\r\n\r" +
+		  Description = "Nuestra API utiliza la Autenticaciï¿½n JWT usando el esquema Bearer. \n\r\n\r" +
+					  "Ingresa la palabra a continuaciï¿½n el token generado en login.\n\r\n\r" +
 					  "Ejemplo: \"12345abcdef\"",
 		  Name = "Authorization",
 		  In = ParameterLocation.Header,
@@ -185,14 +188,14 @@ var apiVersioningBuilder = builder.Services.AddApiVersioning(option =>
 {
 	option.AssumeDefaultVersionWhenUnspecified = true;//asume una version por defecto
 	option.DefaultApiVersion = new ApiVersion(1, 0);// indicamos la version por defecto
-	option.ReportApiVersions = true;//esto para que devuelva  info en los header de respuesta, así: api-supported-versions: 1.0 
+	option.ReportApiVersions = true;//esto para que devuelva  info en los header de respuesta, asï¿½: api-supported-versions: 1.0 
 	//option.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader("api-version"));//?api-version //OSEA va a ser necesario que se pase en la url
 });
 
 apiVersioningBuilder.AddApiExplorer(option =>
 {
 	option.GroupNameFormat = "'v'VVV";//v1,v2,v3 => indincamos esto con esta linea  de codigo
-	option.SubstituteApiVersionInUrl = true;//habilitará el uso de version en la url en cada peticion en la ruta
+	option.SubstituteApiVersionInUrl = true;//habilitarï¿½ el uso de version en la url en cada peticion en la ruta
 	//pero hay que configurar el controlador, en el apiVersioningBuilder y setear la prop
 
 });
@@ -215,8 +218,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
+	app.UseSwagger();
+	app.UseSwaggerUI(options =>
 	{
 		options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
 		options.SwaggerEndpoint("/swagger/v2/swagger.json", "v2");
@@ -231,7 +234,7 @@ app.UseHttpsRedirection();
 /* Uso de la configuracion de cors */
 app.UseCors(PolicyNames.AllowSpecificOrigin);
 
-/*Habilita el uso de cachè*/
+/*Habilita el uso de cachï¿½*/
 app.UseResponseCaching();
 
 //PARA HABILITAR EL AUTHORIZE Y ALLOW ANONYMOUS Siempre antes de UseAuthorization
@@ -254,7 +257,7 @@ AUTOMAPPER 14.0.0
 BCrypt.Net-Next 4.0.3
 
 Microsoft.AspNetCore.Authentication.JwtBearer --esto para configurar luego la authenticacion con jwt en el program
-//usar la misma veersion del sdk con JwtBearer, sino dará problemas
+//usar la misma veersion del sdk con JwtBearer, sino darï¿½ problemas
 
 
 Para el uso de versionamiento instalamos
@@ -269,7 +272,7 @@ Instalar Entity Framework Core Tools en la consola del administrador de paquetes
 dotnet tool install --global dotnet-ef
 
 
-Segundo paso es crear la migración inicial para crear la base de datos y las tablas correspondientes:
+Segundo paso es crear la migraciï¿½n inicial para crear la base de datos y las tablas correspondientes:
 dotnet ef migrations add InitialMigration
 
 Tercer paso crear la base de datos con el siguiente comando:

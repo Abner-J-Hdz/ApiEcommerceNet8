@@ -3,7 +3,7 @@ using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
-using AutoMapper;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -21,12 +21,12 @@ namespace ApiEcommerce.Controllers.V2
 	{
 
 		private readonly ICategoryRepository _categoryRepository;
-		private readonly IMapper _mapper;
 
-		public CategoriesController(ICategoryRepository categoryRepository, IMapper mapper)
+
+	   public CategoriesController(ICategoryRepository categoryRepository)
 		{
 			_categoryRepository = categoryRepository;
-			_mapper = mapper;
+
 		}
 
 		[HttpGet]
@@ -36,7 +36,7 @@ namespace ApiEcommerce.Controllers.V2
 		public IActionResult GetCategoriesOrdeById()
 		{
 			var categories = _categoryRepository.GetCategories().OrderBy(x => x.Id);
-			var categoriesDto = _mapper.Map<List<CategoryDto>>(categories);
+		   var categoriesDto = categories.Adapt<List<CategoryDto>>();
 			return Ok(categoriesDto);
 		}
 
@@ -58,7 +58,7 @@ namespace ApiEcommerce.Controllers.V2
 			if (category is null)
 				return NotFound($"La categoria con id {id} no existe");
 
-			var categoriesDto = _mapper.Map<CategoryDto>(category);
+		   var categoriesDto = category.Adapt<CategoryDto>();
 
 			return Ok(category);
 		}
@@ -80,7 +80,7 @@ namespace ApiEcommerce.Controllers.V2
 				return BadRequest(ModelState);
 			}
 
-			var category = _mapper.Map<Category>(categoryDto);
+		   var category = categoryDto.Adapt<Category>();
 
 			if(!_categoryRepository.CreateCategory(category))
 			{
@@ -113,7 +113,7 @@ namespace ApiEcommerce.Controllers.V2
 				return BadRequest(ModelState);
 			}
 
-			var category = _mapper.Map<Category>(updateCategoryDto);
+		   var category = updateCategoryDto.Adapt<Category>();
 			category.Id = id; // Aseguramos que el ID sea el correcto
 			if (!_categoryRepository.UpdateCategory(category))
 			{

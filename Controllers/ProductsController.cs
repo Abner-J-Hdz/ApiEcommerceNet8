@@ -3,7 +3,7 @@ using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Models.Dtos.Responses;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
-using AutoMapper;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,12 +21,10 @@ namespace ApiEcommerce.Controllers
 	{
 		private readonly IProductoRepository _productoRepository;
 		private readonly ICategoryRepository _categoryRepository;
-		private readonly IMapper _mapper;
 
-		public ProductsController(IProductoRepository productoRepository, IMapper mapper, ICategoryRepository categoryRepository)
+		public ProductsController(IProductoRepository productoRepository, ICategoryRepository categoryRepository)
 		{
 			_productoRepository = productoRepository;
-			_mapper = mapper;
 			_categoryRepository = categoryRepository;
 		}
 
@@ -37,7 +35,7 @@ namespace ApiEcommerce.Controllers
 		public IActionResult GetProducts()
 		{
 			var products = _productoRepository.GetProducts();
-			var productsDto = _mapper.Map<List<ProductDto>>(products);
+		var productsDto = products.Adapt<List<ProductDto>>();
 			return Ok(productsDto);
 		}
 
@@ -53,7 +51,7 @@ namespace ApiEcommerce.Controllers
 			if (product is null)
 				return NotFound($"El producto con id {productId} no existe");
 
-			var productDto = _mapper.Map<ProductDto>(product);
+		var productDto = product.Adapt<ProductDto>();
 
 			return Ok(productDto);
 		}
@@ -80,7 +78,7 @@ namespace ApiEcommerce.Controllers
 			}
 
 			var products = _productoRepository.GetProductsInPages(pageNumber, pageSize);
-			var productsDto = _mapper.Map<List<ProductDto>>(products);
+		var productsDto = products.Adapt<List<ProductDto>>();
 			var paginationResponse = new PaginationResponse<ProductDto>
 			{
 				PageNumber = pageNumber,
@@ -116,7 +114,7 @@ namespace ApiEcommerce.Controllers
 				return BadRequest(ModelState);
 			}
 
-			var product = _mapper.Map<Product>(createProductDto);
+		var product = createProductDto.Adapt<Product>();
 
 			//Agregando la imagen
 			//validar si no estan mandando la imagen
@@ -139,7 +137,7 @@ namespace ApiEcommerce.Controllers
 			//AQUI SI QUEREMOS DEVOLVER EL PRODUCTO CREADO CON LA CATEGORIA, TENDRIAMOS QUE OBTENER EL RECURSO RECIEN CREADO
 
 			var createdProduct = _productoRepository.GetProduct(product.ProductId);
-			var productDto = _mapper.Map<ProductDto>(createdProduct);
+		var productDto = createdProduct.Adapt<ProductDto>();
 
 			//Devuelve un código de estado HTTP 201 Created (indica que el recurso fue creado correctamente).
 			//Incluye en la respuesta un header Location que apunta a la URL donde se puede consultar el nuevo recurso.
@@ -170,7 +168,7 @@ namespace ApiEcommerce.Controllers
 				return NotFound($"No se encontraron productos para la categoria con id {categoryId}");
 			}
 
-			var productsDto = _mapper.Map<List<ProductDto>>(products);
+		var productsDto = products.Adapt<List<ProductDto>>();
 
 			return Ok(productsDto);
 		}
@@ -198,7 +196,7 @@ namespace ApiEcommerce.Controllers
 				return NotFound($"No se encontraron productos con la descripción o nombre '{searchTerm}' ");
 			}
 
-			var productsDto = _mapper.Map<List<ProductDto>>(products);
+		var productsDto = products.Adapt<List<ProductDto>>();
 
 			return Ok(productsDto);
 		}
@@ -262,16 +260,16 @@ namespace ApiEcommerce.Controllers
 				return BadRequest(ModelState);
 			}
 
-			var product = _mapper.Map<Product>(updateProductDto);
+		var product = updateProductDto.Adapt<Product>();
 
 
 			//Agregando la imagen
 			//validar si no estan mandando la imagen
 			if (updateProductDto.Image != null)
-            {
-                UploadProductImage(updateProductDto, product);
-            }
-            else
+			{
+				UploadProductImage(updateProductDto, product);
+			}
+			else
 			{
 				product.ImgUrl = "https://placehold.co/300x300/png";
 			}
@@ -287,34 +285,34 @@ namespace ApiEcommerce.Controllers
 			return NoContent();
 		}
 
-        private void UploadProductImage(dynamic productDto, Product product)
-        {
-            string fileName = product.ProductId.ToString() + "-" + Guid.NewGuid().ToString() + Path.GetExtension(productDto.Image.FileName);
-            var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductsImages");// carpeta donde se guardará la imagen
-                                                                                                          //Sino existe el directorio lo creamos
-            if (!Directory.Exists(imagesFolder))
-            {
-                Directory.CreateDirectory(imagesFolder);
-            }
-            //creamos la ruta donde se guardará la imagen
-            var filePath = Path.Combine(imagesFolder, fileName);
-            //verificamos si ya esiste un archivo igual
-            FileInfo file = new FileInfo(filePath);
-            if (file.Exists)
-            {
-                //si existe lo eliminamos
-                file.Delete();
-            }
-            //vamos a escribir o guradar el archivo
-            using var fileStream = new FileStream(filePath, FileMode.Create);
-            productDto.Image.CopyTo(fileStream);//la imagen dentro del dto lo pasamos al fileStream
+		private void UploadProductImage(dynamic productDto, Product product)
+		{
+			string fileName = product.ProductId.ToString() + "-" + Guid.NewGuid().ToString() + Path.GetExtension(productDto.Image.FileName);
+			var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductsImages");// carpeta donde se guardará la imagen
+																										  //Sino existe el directorio lo creamos
+			if (!Directory.Exists(imagesFolder))
+			{
+				Directory.CreateDirectory(imagesFolder);
+			}
+			//creamos la ruta donde se guardará la imagen
+			var filePath = Path.Combine(imagesFolder, fileName);
+			//verificamos si ya esiste un archivo igual
+			FileInfo file = new FileInfo(filePath);
+			if (file.Exists)
+			{
+				//si existe lo eliminamos
+				file.Delete();
+			}
+			//vamos a escribir o guradar el archivo
+			using var fileStream = new FileStream(filePath, FileMode.Create);
+			productDto.Image.CopyTo(fileStream);//la imagen dentro del dto lo pasamos al fileStream
 
-            var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
-            product.ImgUrl = $"{baseUrl}/productsImages/{fileName}";
-            product.ImageUrlLocal = filePath;
-        }
+			var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+			product.ImgUrl = $"{baseUrl}/productsImages/{fileName}";
+			product.ImageUrlLocal = filePath;
+		}
 
-        [HttpDelete("{productId:int}", Name = "DeleteProduct")]
+		[HttpDelete("{productId:int}", Name = "DeleteProduct")]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]

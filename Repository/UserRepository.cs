@@ -2,7 +2,7 @@
 using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
-using AutoMapper;
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -21,17 +21,17 @@ public class UserRepository : IUserRepository
 
 	private readonly RoleManager<IdentityRole> _rolManager;
 
-	private readonly IMapper _mapper;
 
 
-	public UserRepository(ApplicationDbContext db, IConfiguration configuration, 
-		UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper)
+
+   public UserRepository(ApplicationDbContext db, IConfiguration configuration, 
+	   UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
 	{
 		_dbo = db;
 		secretKey = configuration.GetValue<string>("ApiSettings:SecretKey");
 		_userManager = userManager;
 		_rolManager = roleManager;
-		_mapper = mapper;
+
 	}
 
 	public ApplicationUser? GetUser(string userId)
@@ -128,7 +128,7 @@ public class UserRepository : IUserRepository
 		{
 			Token = handlerToken.WriteToken(token),
 			
-			User = _mapper.Map<UserDataDto>(user),
+		   User = user.Adapt<UserDataDto>(),
 
 			Message = "Usuario logueado correctamente"
 		};
@@ -177,7 +177,7 @@ public class UserRepository : IUserRepository
 
 			var createdUser = _dbo.ApplicationUsers.FirstOrDefault(u => u.UserName == createUserDto.Username);
 
-			return _mapper.Map<UserDataDto>(createdUser);
+	   return createdUser.Adapt<UserDataDto>();
 		}
 		var errors = string.Join(",", result.Errors.Select(e => e.Description));
 
